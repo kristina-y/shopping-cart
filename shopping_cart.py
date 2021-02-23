@@ -1,5 +1,9 @@
 # shopping_cart.py
 
+
+
+ 
+
 products = [
     {"id":1, "name": "Chocolate Sandwich Cookies", "department": "snacks", "aisle": "cookies cakes", "price": 3.50},
     {"id":2, "name": "All-Seasons Salt", "department": "pantry", "aisle": "spices seasonings", "price": 4.99},
@@ -37,6 +41,66 @@ def to_usd(my_price):
     return f"${my_price:,.2f}" #> $12,000.71
 
 
-# TODO: write some Python code here to produce the desired output
+# empty list of items that will be filled with user inputs
+grocery_list = []
 
-print(products)
+# capturing using inputs
+while True:
+    
+    user_input = input("Please input a product identifier, or type 'DONE' of there are no more: ")
+
+    if user_input == "DONE":
+        
+        #End while loop if user typed "DONE"
+        break
+
+    else:
+
+        # verify the user input
+        try:
+            identifier = int(user_input)
+            if (identifier in range(1,21)):
+                # user_input is valid! Adding to list
+                grocery_list.append(identifier)
+            else:
+                print("The product identifier should be an integer between 1 and 20. Please try again.")
+        
+        except ValueError:
+            # User input is invalid
+            print("The product identifier should be an integer between 1 and 20. Please try again.")
+        # The try... except... method of validating input was adapted from pynative.com
+
+def lookup_product(product_identifier):
+    # Takes in the product identifier and returns the name and price, using the products list
+    product_info = products[product_identifier]
+    product_name = product_info["name"]
+    product_price = product_info["price"]
+    product_name_and_price = {"name": product_name, "price": product_price}
+    return product_name_and_price
+
+
+# Print Receipt Header:
+print("---------------------------")
+print("KRISTINA'S GROCERY STORE")
+print("---------------------------")
+print("Web: KRISTINA-GROCERY.COM")
+print("Phone: (202) 123-4567")
+print("---------------------------")
+print("Shopping Cart Items:")
+
+
+# Loop through grocery_list, printing out the name and price of each product
+total_price = 0
+for i in grocery_list:
+    results = lookup_product(i - 1)
+    total_price = total_price + results["price"]
+    print("... ", results["name"], to_usd(results["price"]))
+print("---------------------------")
+print("SUBTOTAL: ", to_usd(total_price))
+
+taxes = total_price * 0.06
+
+print("SALES TAX IN DC:", to_usd(taxes))
+print("TOTAL:", to_usd(total_price + taxes))
+
+# print(products)
