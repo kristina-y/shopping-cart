@@ -149,9 +149,9 @@ load_dotenv()
 TAX_RATE = os.getenv("TAX_RATE", default = 0.0875)
 
 # Calculates taxes using TAX_RATE
-taxes = total_price * 0.0875
+taxes = total_price * float(TAX_RATE)
 
-print("SALES TAX IN NY:", to_usd(taxes))
+print("SALES TAX:", to_usd(taxes))
 print("TOTAL:", to_usd(total_price + taxes))
 print("---------------------------")
 print("Thank you for shopping at Kristina's Grocery! Please come again!")
