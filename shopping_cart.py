@@ -1,8 +1,5 @@
 # shopping_cart.py
-
-
-
- 
+# This program allows the user to enter groceries by user id and then prints a receipt with the total price.
 
 products = [
     {"id":1, "name": "Chocolate Sandwich Cookies", "department": "snacks", "aisle": "cookies cakes", "price": 3.50, "price_per": "item"},
@@ -42,6 +39,24 @@ def to_usd(my_price):
     """
     return f"${my_price:,.2f}" #> $12,000.71
 
+def price_per_pound_lookup(product_identifier):
+    # This function looks up whether the item uses price per pound or price per item.
+    # If price per POUND, it returns TRUE; if price per ITEM it returns false
+    product_info = products[product_identifier]
+    product_price_per = product_info["price_per"]
+    if product_price_per == "pound":
+        return True
+    else:
+        return False
+
+
+def lookup_product(product_identifier):
+    # Takes in the product identifier and returns the name and price, using the products list
+    product_info = products[product_identifier]
+    product_name = product_info["name"]
+    product_price = product_info["price"]
+    product_name_and_price = {"name": product_name, "price": product_price}
+    return product_name_and_price
 
 # empty list of items that will be filled with user inputs
 grocery_list = []
@@ -49,7 +64,7 @@ grocery_list = []
 # capturing using inputs
 while True:
     
-    user_input = input("Please input a product identifier, or type 'DONE' of there are no more: ")
+    user_input = input("Please input a product identifier, or type 'DONE' if there are no more: ")
 
     if user_input == "DONE":
         
@@ -63,7 +78,25 @@ while True:
             identifier = int(user_input)
             if (identifier in range(1,len(products)+1)):
                 # user_input is valid! Adding to list
-                grocery_list.append(identifier)
+
+                # check if price_per_pound
+                if price_per_pound_lookup(identifier-1) == True:
+                    pounds = input("Please enter the number of pounds: ")
+                    # Verify pounds is an int:
+                    try: 
+                        weight = float(pounds)
+                        grocery_list.append({"id": identifier, "weight": weight})
+
+                    except ValueError:
+                        print("The weight should be a number. Please try again.")
+
+
+                    
+                else:
+                    # Adds item to grocery list dictionary with fake weight of 1, which will be used in multiplication later
+                    grocery_list.append({"id": identifier, "weight": 1.1})
+
+
             else:
                 print("The product identifier should be an integer between 1 and 21. Please try again.")
         
@@ -71,14 +104,6 @@ while True:
             # User input is invalid
             print("The product identifier should be an integer between 1 and 21. Please try again.")
         # The try... except... method of validating input was adapted from pynative.com
-
-def lookup_product(product_identifier):
-    # Takes in the product identifier and returns the name and price, using the products list
-    product_info = products[product_identifier]
-    product_name = product_info["name"]
-    product_price = product_info["price"]
-    product_name_and_price = {"name": product_name, "price": product_price}
-    return product_name_and_price
 
 
 # Print Receipt Header:
@@ -88,21 +113,36 @@ print("---------------------------")
 print("Web: KRISTINA-GROCERY.COM")
 print("Phone: (202) 123-4567")
 print("---------------------------")
+from datetime import datetime
+now = datetime.now()
+print("Checkout at: ", now.strftime("%d/%m/%Y %I:%M %p"))
+print("---------------------------")
 print("Shopping Cart Items:")
 
 
 # Loop through grocery_list, printing out the name and price of each product
 total_price = 0
 for i in grocery_list:
-    results = lookup_product(i - 1)
-    total_price = total_price + results["price"]
-    print("... ", results["name"], to_usd(results["price"]))
+    # Retrieves product name and price
+    results = lookup_product(i["id"] - 1)
+    
+    # Checks if item is priced per pound or per item
+    if price_per_pound_lookup(i["id"]-1) == "item":
+        
+        total_price = total_price + results["price"]
+        print("... ", results["name"], to_usd(results["price"]))
+    else:
+        # If product is priced per pound, it multiplies the weight by the price
+        total_price = total_price + results["price"] * i["weight"]
+        print("... ", results["name"], to_usd(results["price"] * i["weight"]))
+
 print("---------------------------")
 print("SUBTOTAL: ", to_usd(total_price))
 
-taxes = total_price * 0.06
+# Calculates taxes using NY sales tax
+taxes = total_price * 0.0875
 
-print("SALES TAX IN DC:", to_usd(taxes))
+print("SALES TAX IN NY:", to_usd(taxes))
 print("TOTAL:", to_usd(total_price + taxes))
-
-# print(products)
+print("---------------------------")
+print("Thank you for shopping at Kristina's Grocery! Please come again!")
