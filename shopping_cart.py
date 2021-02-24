@@ -1,5 +1,7 @@
 # shopping_cart.py
 # This program allows the user to enter groceries by user id and then prints a receipt with the total price.
+import os
+
 
 products = [
     {"id":1, "name": "Chocolate Sandwich Cookies", "department": "snacks", "aisle": "cookies cakes", "price": 3.50, "price_per": "item"},
@@ -139,7 +141,14 @@ for i in grocery_list:
 print("---------------------------")
 print("SUBTOTAL: ", to_usd(total_price))
 
-# Calculates taxes using NY sales tax
+# Getting the load_dotenv() function and then invoking it
+# The following two lines of code came from Professor Rossetti's slack message:
+from dotenv import load_dotenv
+load_dotenv()
+
+TAX_RATE = os.getenv("TAX_RATE", default = 0.0875)
+
+# Calculates taxes using TAX_RATE
 taxes = total_price * 0.0875
 
 print("SALES TAX IN NY:", to_usd(taxes))
